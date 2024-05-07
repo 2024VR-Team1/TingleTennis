@@ -11,7 +11,7 @@ public class npsController : MonoBehaviour{
     public GameObject PATH;
     public Transform[] PathPoints;
 
-    public float minDistance = 1;
+    public float minDistance = 0.3f;
 
     public int index = 0;
 
@@ -25,20 +25,61 @@ public class npsController : MonoBehaviour{
         }
     }
 
+    float t = 1f;
+    bool hasReachedUser = false;
+    bool introEnd = false;
+
     void Update(){
-        roam();
+        // Coach approaching the user
+        if(!hasReachedUser){
+            Roam();
+        }
+
+        if(hasReachedUser  && !introEnd){
+            Idle();
+        }
+        // Start to walk to the racket
+        if(introEnd){
+            WalkToRacket();
+        }
     }
 
-    void roam(){
-
-        if(Vector3.Distance(transform.position, PathPoints[index].position) < minDistance){
-            if(index >= 0 && index < PathPoints.Length){
-                index += 1;
+    void Roam(){
+        if(index < 3){
+            if(Vector3.Distance(transform.position, PathPoints[index].position) < minDistance){
+                // Debug.Log("distance: " + Vector3.Distance(transform.position, PathPoints[index].position));
+                if(index >= 0 && index < PathPoints.Length - 1){
+                    index += 1;
+                }
             }
-            else{
-                index = 0;
+            agent.SetDestination(PathPoints[index].position);
+            animator.SetFloat("vertical", 1 ); //  agent.isStopped ? 1 : 0
+        }
+        else{
+            agent.SetDestination(PathPoints[3].position);
+            t = Vector3.Distance(transform.position, PathPoints[3].position) < 0.47f ? 0f : 1f;
+            animator.SetFloat("vertical", Mathf.Lerp(1f, 0f, 1f - t));
+            if (t == 0f) { // reached the user
+                hasReachedUser = true;
             }
         }
-        agent.SetDestination(PathPoints[index].position);
+    }
+
+    void Idle(){
+        animator.SetBool("reached", true);
+        // Debug.Log("here");
+
+        // if the button is pressed, go to right walk
+        StartCoroutine(DelayedIntroEnd());
+    }
+
+    IEnumerator DelayedIntroEnd() {
+        yield return new WaitForSeconds(3f);
+        // animator.SetBool("introEnd", true);
+        introEnd = true;
+    }
+
+    void WalkToRacket(){
+        animator.SetBool("introEnd", true);
     }
 }
