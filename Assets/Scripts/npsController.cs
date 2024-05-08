@@ -83,11 +83,12 @@ public class npsController : MonoBehaviour{
         }
 
         if(startToRotate){
-            Debug.Log("gogogo");
+            // Debug.Log("gogogo");
             float t = (Time.time - startTime) / 2f;
             transform.rotation = Quaternion.Euler(0f, rotateAngle, 0f);
             // transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 130f, 0f), t);
             startToRotate = false;
+            Invoke("WaveHands", 1f);
         }
 
         // if(talkingBoard){
@@ -172,5 +173,9 @@ public class npsController : MonoBehaviour{
         teachingPanel.SetActive(false);
         animator.SetBool("buttonClicked", true);
         goToRacket = true;
+    }
+
+    void WaveHands(){
+        animator.SetBool("wavingMode", true);
     }
 }
