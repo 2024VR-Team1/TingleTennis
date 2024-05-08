@@ -27,6 +27,11 @@ public class npsController : MonoBehaviour{
     public GameObject panelObject;
     public GameObject teachingPanel;
     public Button closeButton;
+    public GameObject wavingPanel;
+    public GameObject racketPanel;
+
+    // get player position
+    public GameObject player;
 
     void Start(){
         agent = GetComponent<NavMeshAgent>();
@@ -43,6 +48,7 @@ public class npsController : MonoBehaviour{
         }
 
         panelObject.SetActive(false);
+        racketPanel.SetActive(false);
 
         if (closeButton != null)
         {
@@ -55,6 +61,7 @@ public class npsController : MonoBehaviour{
     bool introEnd = false;
     bool goToRacket = false;
     bool startToRotate = false;
+    bool wavingPanelMode = false;
 
     // talking
     bool startTalking = false;
@@ -89,6 +96,22 @@ public class npsController : MonoBehaviour{
             // transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 130f, 0f), t);
             startToRotate = false;
             Invoke("WaveHands", 1f);
+            wavingPanel.SetActive(true);
+            wavingPanelMode = true;
+        }
+
+        if(wavingPanelMode){
+            if (player != null)
+            {
+                float distanceToPlayer = Vector3.Distance(new Vector3(transform.position.x, 0f, transform.position.z), new Vector3(player.transform.position.x, 0f, player.transform.position.z));
+                if (distanceToPlayer < 3.5f)
+                {
+                    Debug.Log("wowowow");
+                    wavingPanel.SetActive(false);
+                    wavingPanelMode = false;
+                    racketPanel.SetActive(true);
+                }
+            }
         }
 
         // if(talkingBoard){
