@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class npsController : MonoBehaviour{
 
     public NavMeshAgent agent;
     public Animator animator;
+    
 
     // TODO: intro path
     public GameObject INTROPATH;
@@ -19,6 +21,12 @@ public class npsController : MonoBehaviour{
     public Transform[] RightPathPoints;
     public int walkIndex = 0;
     private float startTime;
+    public float rotateAngle = 190f;
+
+    // panel
+    public GameObject panelObject;
+    public GameObject teachingPanel;
+    public Button closeButton;
 
     void Start(){
         agent = GetComponent<NavMeshAgent>();
@@ -34,7 +42,12 @@ public class npsController : MonoBehaviour{
             RightPathPoints[i] = rightWalkPath.transform.GetChild(i);
         }
 
-        
+        panelObject.SetActive(false);
+
+        if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(ClosePanel);
+        }
     }
 
     float t = 1f;
@@ -42,7 +55,9 @@ public class npsController : MonoBehaviour{
     bool introEnd = false;
     bool goToRacket = false;
     bool startToRotate = false;
-    public float rotateAngle = 190f;
+
+    // talking
+    bool startTalking = false;
 
     void Update(){
         // Debug.Log("introend is : " + introEnd);
@@ -52,7 +67,12 @@ public class npsController : MonoBehaviour{
         }
 
         if(hasReachedUser  && !introEnd){
+            panelObject.SetActive(true);
             Idle();
+        }
+
+        if(startTalking && !goToRacket){
+            CoachTalking();
         }
         // Start to walk to the racket
         if(goToRacket){
@@ -108,11 +128,13 @@ public class npsController : MonoBehaviour{
     }
 
     IEnumerator DelayedIntroEnd() {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         // animator.SetBool("introEnd", true);
-        // introEnd = true;
+        introEnd = true;
         // goToRacket = true;
         animator.SetBool("talkingBoard", true);
+        startTalking = true;
+        // panelObject.SetActive(false);
     }
 
     void WalkToRacket(){
@@ -142,6 +164,13 @@ public class npsController : MonoBehaviour{
     }
 
     void CoachTalking(){
+        animator.SetBool("talkingBoard", true);
+    }
 
+    void ClosePanel()
+    {
+        teachingPanel.SetActive(false);
+        animator.SetBool("buttonClicked", true);
+        goToRacket = true;
     }
 }
